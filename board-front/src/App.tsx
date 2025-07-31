@@ -5,6 +5,8 @@ import latestBoardListMock from 'mocks/latest-board-list.mock';
 import Top3Item from 'components/Top3Item';
 import { commentListMock, top3boardListMock } from 'mocks';
 import CommentItem from 'components/commentItem';
+import favoriteListMock from 'mocks/favorite-list.mock';
+import FavoriteItem from 'components/FavoriteItem';
 
 // 여기서 뷰를 렌더링 해준다
 function App() {
@@ -13,14 +15,13 @@ function App() {
     <>
       <div
         style={{
-          padding: '0 20px',
           display: 'flex',
-          flexDirection: 'column',
-          gap: '30px',
+          columnGap: '30px',
+          rowGap: '20px',
         }}
       >
-        {commentListMock.map((commentListItem) => (
-          <CommentItem commentListItem={commentListItem} />
+        {favoriteListMock.map((favoriteListItem) => (
+          <FavoriteItem favoriteListItem={favoriteListItem} />
         ))}
       </div>
     </>
