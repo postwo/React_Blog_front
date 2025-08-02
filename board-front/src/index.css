@@ -7,6 +7,15 @@
   font-style: normal;
 }
 
+/*https://noonnu.cc/font_page/pick 이사이트에서 폰트 추가 가능*/
+@font-face {
+  font-family: 'GimhaeGaya';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2202-2@1.0/GimhaeGayaR.woff')
+    format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
 /*font-family	실제 요소에 폰트를 적용함*/
 /*화면 전체의 기본 글꼴은 Pretendard-Regular로 설정*/
 body {
