@@ -165,7 +165,7 @@ export default function Header() {
       navigate(USER_PATH(email));
     };
 
-    //            event handler: 마이페이지 버튼 클릭 이벤트 처리 함수  //
+    //            event handler: 마이페이지 버튼 클릭 이벤트 처리 함수: 로그아웃 하면 쿠기 삭제   //
     const onSignOutButtonClickHandler = () => {
       resetLoginUser();
       setCookie('accessToken', '', { path: MAIN_PATH(), expires: new Date() });
