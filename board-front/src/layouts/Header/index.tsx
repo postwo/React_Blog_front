@@ -205,7 +205,7 @@ export default function Header() {
   //            component: 업로드 버튼 컴포넌트       //
   const UploadButton = () => {
     //            state:게시물 상태         //
-    const { title, content, boardImageFileList, restBoard } = useBoardStore();
+    const { title, content, boardImageFileList, resetBoard } = useBoardStore();
 
     //            event handler: 업로드 버튼 클릭이벤트 처리  함수 //
     const onUploadButtonClickHandler = () => {};
