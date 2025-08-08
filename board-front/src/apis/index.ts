@@ -5,6 +5,8 @@ import { ResponsDto } from './response';
 import { error } from 'console';
 import { off } from 'process';
 import { GetSignInUserResponseDto } from './response/user';
+import { PostBoardRequestDto } from './request/board';
+import { PostBoardResponseDto } from './response/board';
 
 const DOMAIN = 'http://localhost:4000';
 
@@ -47,6 +49,28 @@ export const signUpRequest = async (requestBody: SignUpRequestDto) => {
   return result;
 };
 
+//게시글 작성
+const POST_BOARD_URL = () => `${API_DOMAIN}/board`;
+
+export const postBoardReqeust = async (
+  requestBody: PostBoardRequestDto,
+  accessToken: string
+) => {
+  const reuslt = await axios
+    .post(POST_BOARD_URL(), requestBody, authorization(accessToken))
+    .then((response) => {
+      const responseBody: PostBoardResponseDto = response.data;
+      return responseBody;
+    })
+    .catch((error) => {
+      if (!error.response) return null;
+      const responseBody: ResponsDto = error.response.data;
+      return responseBody;
+    });
+  return reuslt;
+};
+
+// 마이페이지
 const Get_SIGN_IN_USER_URL = () => `${API_DOMAIN}/user`;
 
 export const GetSignInUserReuest = async (accessToken: string) => {
@@ -60,6 +84,28 @@ export const GetSignInUserReuest = async (accessToken: string) => {
       if (!error.response) return null;
       const responseBody: ResponsDto = error.response.data;
       return responseBody;
+    });
+  return result;
+};
+
+//파일 업로드
+const FILE_DOMAIN = `${DOMAIN}/file`;
+
+const FILE_UPLOAD_URL = () => `${FILE_DOMAIN}/upload`;
+
+const multipartFormData = {
+  headers: { 'Content-Type': 'multipart/form-data' },
+};
+
+export const fileUploadRequest = async (data: FormData) => {
+  const result = await axios
+    .post(FILE_UPLOAD_URL(), data, multipartFormData)
+    .then((response) => {
+      const responseBody: string = response.data;
+      return responseBody;
+    })
+    .catch((error) => {
+      return null;
     });
   return result;
 };

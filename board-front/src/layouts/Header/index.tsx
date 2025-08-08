@@ -25,7 +25,10 @@ import {
 import { useCookies } from 'react-cookie';
 import { useBoardStore, useLoginUserStore } from 'stores';
 import BoardDetail from '../../views/Board/Detail';
-import { Console } from 'console';
+import { fileUploadRequest, postBoardReqeust } from 'apis';
+import PostBoardRequestDto from 'apis/request/board/post-board-request.dto';
+import { PostBoardResponseDto } from 'apis/response/board';
+import { ResponsDto } from 'apis/response';
 
 //            component: 헤더 레이아웃         //
 export default function Header() {
@@ -207,8 +210,46 @@ export default function Header() {
     //            state:게시물 상태         //
     const { title, content, boardImageFileList, resetBoard } = useBoardStore();
 
-    //            event handler: 업로드 버튼 클릭이벤트 처리  함수 //
-    const onUploadButtonClickHandler = () => {};
+    //           function: post board response 처리 함수        //
+    const postBoardResponse = (
+      responseBody: PostBoardResponseDto | ResponsDto | null
+    ) => {
+      if (!responseBody) return;
+      const { code } = responseBody;
+
+      if (code === 'AF' || code === 'NU') navigate(AUTH_PATH());
+      if (code === 'VF') alert('제목과 내용은 필수 입니다');
+      if (code === 'DBE') alert('데이터베이스 오류입니다');
+      if (code !== 'SU') return;
+
+      resetBoard(); // 보드 페이지 초기화
+      if (!loginUser) return; // 유저가 없을 경우 빈값 반환
+      const { email } = loginUser; // loginuser에서 email을 가지고 온다
+      navigate(USER_PATH(email)); // 마이페이지로 이동
+    };
+
+    //            event handler: 업로드 버튼 클릭이벤트 처리       //
+    const onUploadButtonClickHandler = async () => {
+      const accessToken = cookies.accessToken;
+      if (!accessToken) return;
+
+      const boardImageList: string[] = [];
+
+      for (const file of boardImageFileList) {
+        const data = new FormData();
+        data.append('file', file);
+
+        const url = await fileUploadRequest(data);
+        if (url) boardImageList.push(url);
+      }
+
+      const requestBody: PostBoardRequestDto = {
+        title,
+        content,
+        boardImageList,
+      };
+      postBoardReqeust(requestBody, accessToken).then(postBoardResponse);
+    };
 
     //            render: 업로드 버튼 컴포넌트 렌더링        //
     if (title && content)
