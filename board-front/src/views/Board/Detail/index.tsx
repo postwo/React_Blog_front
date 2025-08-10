@@ -126,7 +126,7 @@ export default function BoardDetail() {
           <div className="board-detail-bottom-comment-pagination-box">
             <Pagenation />
           </div>
-          <div className="board-detail-bottom-comment-input-container">
+          <div className="board-detail-bottom-comment-input-box">
             <div className="board-detail-bottom-comment-input-container">
               <textarea
                 className="board-detail-bottom-comment-textarea"
