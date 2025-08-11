@@ -11,6 +11,10 @@ import DefaultProfileImage from 'assets/image/default-profile-image.png';
 import { useLoginUserStore } from 'stores';
 import { useNavigate, useParams } from 'react-router-dom';
 import { BOARD_PATH, BOARD_UPDATE_PATH, MAIN_PATH, USER_PATH } from 'constant';
+import { getBoardRequest, increaseViewCountRequest } from 'apis';
+import GetBoardResponseDto from 'apis/response/board/get-board.response.dto';
+import { ResponsDto } from 'apis/response';
+import { IncreaseViewCountResponseDto } from 'apis/response/board';
 
 //            component: 게시물 상세 화면 컴포넌트      //
 export default function BoardDetail() {
@@ -23,13 +27,51 @@ export default function BoardDetail() {
   //        function: 네비게이트 함수       //
   const navigator = useNavigate();
 
+  //        function: increase View Count Response 처리 함수     //
+  const increaseViewCountResponse = (
+    responseBody: IncreaseViewCountResponseDto | ResponsDto | null
+  ) => {
+    if (!responseBody) return;
+    const { code } = responseBody;
+    if (code === 'NB') alert('존재하지 않는 게시물 입니다');
+    if (code === 'DBE') alert('데이터 베이스 오류 입니다');
+  };
+
   //        component: 게시물 상세 상단 컴포넌트      //
   const BoardDetailTop = () => {
+    //        state: 작성자 여부 상태        //
+    const [isWriter, setWriter] = useState<boolean>(false);
+
     //        state: more 버튼 상태        //
     const [board, setBoard] = useState<Board | null>(null);
 
     //        state: more 버튼 상태        //
     const [showMore, setShowMore] = useState<boolean>(false);
+
+    //        function: get board response 처리 함수    //
+    const getBoardResponse = (
+      responseBody: GetBoardResponseDto | ResponsDto | null
+    ) => {
+      if (!responseBody) return;
+      const { code } = responseBody;
+      if (code === 'NB') alert('존재하지 않는 게시물 입니다');
+      if (code === 'DBE') alert('데이터 베이스 오류 입니다');
+      if (code !== 'SU') {
+        navigator(MAIN_PATH());
+        return;
+      }
+
+      const board: Board = { ...(responseBody as GetBoardResponseDto) };
+      setBoard(board);
+
+      //작성자가 아니면 수정/삭제 못하게 하기 위해 버튼 숨김
+      if (!loginUser) {
+        setWriter(false);
+        return;
+      }
+      const isWriter = loginUser.email === board.writerEmail;
+      setWriter(isWriter);
+    };
 
     //        event handler: 닉네임 클릭 이벤트 처리   //
     const onNicknameClickHandler = () => {
@@ -59,7 +101,11 @@ export default function BoardDetail() {
 
     //        effect: 게시물 번호 path variable이 바뀔때 마다 게시물 불러오기       //
     useEffect(() => {
-      setBoard(boardMock);
+      if (!boardNumber) {
+        navigator(MAIN_PATH());
+        return;
+      }
+      getBoardRequest(boardNumber).then(getBoardResponse);
     }, [boardNumber]);
 
     //        render: 게시물 상세 상단 컴포넌트 렌더링   //
@@ -91,9 +137,12 @@ export default function BoardDetail() {
                 {board.writeDatetime}
               </div>
             </div>
-            <div className="icon-button" onClick={onMoreButtonClickHandler}>
-              <div className="icon more-icon"></div>
-            </div>
+            {isWriter && (
+              <div className="icon-button" onClick={onMoreButtonClickHandler}>
+                <div className="icon more-icon"></div>
+              </div>
+            )}
+
             {/*showmore 가 true이면 수정 삭제를 보여준다 */}
             {showMore && (
               <div className="board-detail-more-box">
@@ -277,6 +326,17 @@ export default function BoardDetail() {
       </div>
     );
   };
+
+  //        effect: 게시물 번호 path variable이 바뀔때 마다 게시물 조회수 증가     //
+  let effectFlag = true;
+  useEffect(() => {
+    if (!boardNumber) return;
+    if (effectFlag) {
+      effectFlag = false;
+      return;
+    }
+    increaseViewCountRequest(boardNumber).then(increaseViewCountResponse);
+  }, [boardNumber]);
 
   //          render: 게시물 상세 화면 컴포넌트 렌더링   //
   return (
