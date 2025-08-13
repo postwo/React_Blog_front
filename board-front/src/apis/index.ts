@@ -14,6 +14,7 @@ import {
   GetCommentListResponseDto,
   PutFavoriteResponseDto,
   PostCommentResponseDto,
+  DeleteBoardResponseDto,
 } from './response/board';
 import { request } from 'http';
 
@@ -236,6 +237,28 @@ export const PostCommentRequest = async (
     )
     .then((response) => {
       const responseBody: PostCommentResponseDto = response.data;
+      return responseBody;
+    })
+    .catch((error) => {
+      if (!error.response) return null;
+      const responseBody: ResponsDto = error.response.data;
+      return responseBody;
+    });
+  return result;
+};
+
+//댓글 삭제
+export const DELETE_BOARD_URL = (boardNumber: number | string) =>
+  `${API_DOMAIN}/board/${boardNumber}`;
+
+export const deleteBoardRequest = async (
+  boardNumber: number | string,
+  accessToken: string
+) => {
+  const result = await axios
+    .delete(DELETE_BOARD_URL(boardNumber), authorization(accessToken))
+    .then((response) => {
+      const responseBody: DeleteBoardResponseDto = response.data;
       return responseBody;
     })
     .catch((error) => {
