@@ -2,8 +2,6 @@ import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import './style.css';
 import FavoriteItem from 'components/FavoriteItem';
 import { Board, CommentListItem, FavoriteListItem } from 'types/interface';
-import favoriteListMock from 'mocks/favorite-list.mock';
-import { boardMock, commentListMock } from 'mocks';
 import CommentItem from 'components/CommentItem';
 import Pagenation from 'components/PageNation';
 
@@ -11,10 +9,21 @@ import DefaultProfileImage from 'assets/image/default-profile-image.png';
 import { useLoginUserStore } from 'stores';
 import { useNavigate, useParams } from 'react-router-dom';
 import { BOARD_PATH, BOARD_UPDATE_PATH, MAIN_PATH, USER_PATH } from 'constant';
-import { getBoardRequest, increaseViewCountRequest } from 'apis';
+import {
+  getBoardRequest,
+  getCommentListRequest,
+  getFavoriteListRequest,
+  increaseViewCountRequest,
+} from 'apis';
 import GetBoardResponseDto from 'apis/response/board/get-board.response.dto';
 import { ResponsDto } from 'apis/response';
-import { IncreaseViewCountResponseDto } from 'apis/response/board';
+import {
+  GetCommentListResponseDto,
+  GetFavoriteListResponseDto,
+  IncreaseViewCountResponseDto,
+} from 'apis/response/board';
+
+import dayjs from 'dayjs';
 
 //            component: 게시물 상세 화면 컴포넌트      //
 export default function BoardDetail() {
@@ -47,6 +56,13 @@ export default function BoardDetail() {
 
     //        state: more 버튼 상태        //
     const [showMore, setShowMore] = useState<boolean>(false);
+
+    //        function: 작서일 포멧 변경 함수    //
+    const getWriteDatetimeFormat = () => {
+      if (!board) return '';
+      const date = dayjs(board.writeDatetime);
+      return date.format('YYYY. MM. DD.');
+    };
 
     //        function: get board response 처리 함수    //
     const getBoardResponse = (
@@ -134,7 +150,7 @@ export default function BoardDetail() {
               </div>
               <div className="board-detail-info-divider">{'|'}</div>
               <div className="board-detail-write-date">
-                {board.writeDatetime}
+                {getWriteDatetimeFormat()}
               </div>
             </div>
             {isWriter && (
@@ -193,6 +209,48 @@ export default function BoardDetail() {
     //      state: 댓글 상태              //
     const [comment, setComment] = useState<string>('');
 
+    //      event handler: get favorite list response 처리 함수       //
+    const getFavoriteListResponse = (
+      responseBody: GetFavoriteListResponseDto | ResponsDto | null
+    ) => {
+      if (!responseBody) return;
+
+      const { code } = responseBody;
+      if (code === 'NB') alert('존재하지 않는 게시물 입니다');
+      if (code === 'DBE') alert('데이터 베이스 오류 입니다');
+      if (code !== 'SU') return;
+
+      const { favoriteList } = responseBody as GetFavoriteListResponseDto;
+      setFavoriteList(favoriteList);
+
+      if (!loginUser) {
+        setfavorite(false);
+        return;
+      }
+
+      // 존재하지 않으면 -1을 반환
+      const isFavorite =
+        favoriteList.findIndex(
+          (favorite) => favorite.email === loginUser.email
+        ) !== -1;
+      setfavorite(isFavorite);
+    };
+
+    //      event handler: get comment list response 처리 함수       //
+    const getCommentListResponse = (
+      responseBody: GetCommentListResponseDto | ResponsDto | null
+    ) => {
+      if (!responseBody) return;
+
+      const { code } = responseBody;
+      if (code === 'NB') alert('존재하지 않는 게시물 입니다');
+      if (code === 'DBE') alert('데이터 베이스 오류 입니다');
+      if (code !== 'SU') return;
+
+      const { commentListItem } = responseBody as GetCommentListResponseDto;
+      setCommentList(commentListItem);
+    };
+
     //      event handler: 좋아요 클릭 이벤트 처리        //
     const onFavoriteClickHandler = () => {
       setfavorite(!isFavorite);
@@ -228,8 +286,9 @@ export default function BoardDetail() {
 
     //      effect: 게시물 번호 path variable이 발뀔때 마다 좋아요 및 댓글 리스트 불러오기      //
     useEffect(() => {
-      setFavoriteList(favoriteListMock);
-      setCommentList(commentListMock);
+      if (!boardNumber) return;
+      getFavoriteListRequest(boardNumber).then(getFavoriteListResponse);
+      getCommentListRequest(boardNumber).then(getCommentListResponse);
     }, []);
 
     //      render: 게시물 상세 하단 컴포넌트 렌더링   //
@@ -283,6 +342,7 @@ export default function BoardDetail() {
             </div>
           </div>
         )}
+        {/*로그인한 유저만 달수 있게 한다*/}
         {showComment && (
           <div className="board-detail-bottom-comment-box">
             <div className="board-detail-bottom-comment-container">

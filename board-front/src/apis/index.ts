@@ -10,6 +10,8 @@ import {
   PostBoardResponseDto,
   GetBoardResponseDto,
   IncreaseViewCountResponseDto,
+  GetFavoriteListResponseDto,
+  GetCommentListResponseDto,
 } from './response/board';
 
 const DOMAIN = 'http://localhost:4000';
@@ -150,6 +152,44 @@ export const fileUploadRequest = async (data: FormData) => {
     })
     .catch((error) => {
       return null;
+    });
+  return result;
+};
+
+// 좋아요한 게시글 가져오기
+const GET_FAVORITE_LIST_URL = (boardNumber: number | string) =>
+  `${API_DOMAIN}/board/${boardNumber}/favorite-list`;
+
+export const getFavoriteListRequest = async (boardNumber: number | string) => {
+  const result = await axios
+    .get(GET_FAVORITE_LIST_URL(boardNumber))
+    .then((response) => {
+      const responseBody: GetFavoriteListResponseDto = response.data;
+      return responseBody;
+    })
+    .catch((error) => {
+      if (!error.response) return null;
+      const responseBody: ResponsDto = error.response.data;
+      return responseBody;
+    });
+  return result;
+};
+
+// 댓글 리스트 불러오기
+const GET_COMMENT_LIST_URL = (boardNumber: number | string) =>
+  `${API_DOMAIN}/board/${boardNumber}/comment-list`;
+
+export const getCommentListRequest = async (boardNumber: number | string) => {
+  const result = await axios
+    .get(GET_COMMENT_LIST_URL(boardNumber))
+    .then((response) => {
+      const responseBody: GetCommentListResponseDto = response.data;
+      return responseBody;
+    })
+    .catch((error) => {
+      if (!error.response) return null;
+      const responseBody: ResponsDto = error.response.data;
+      return responseBody;
     });
   return result;
 };
