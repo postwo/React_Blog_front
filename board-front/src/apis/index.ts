@@ -12,6 +12,7 @@ import {
   IncreaseViewCountResponseDto,
   GetFavoriteListResponseDto,
   GetCommentListResponseDto,
+  PutFavoriteResponseDto,
 } from './response/board';
 
 const DOMAIN = 'http://localhost:4000';
@@ -184,6 +185,28 @@ export const getCommentListRequest = async (boardNumber: number | string) => {
     .get(GET_COMMENT_LIST_URL(boardNumber))
     .then((response) => {
       const responseBody: GetCommentListResponseDto = response.data;
+      return responseBody;
+    })
+    .catch((error) => {
+      if (!error.response) return null;
+      const responseBody: ResponsDto = error.response.data;
+      return responseBody;
+    });
+  return result;
+};
+
+// 좋아요
+const PUT_FAVORITE_URL = (boardNumber: number | string) =>
+  `${API_DOMAIN}/board/${boardNumber}/favorite`;
+
+export const putFavoriteRequest = async (
+  boardNumber: number | string,
+  accessToken: string
+) => {
+  const result = await axios
+    .put(PUT_FAVORITE_URL(boardNumber), {}, authorization(accessToken))
+    .then((response) => {
+      const responseBody: PutFavoriteResponseDto = response.data;
       return responseBody;
     })
     .catch((error) => {
