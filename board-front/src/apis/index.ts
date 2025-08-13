@@ -5,7 +5,7 @@ import { ResponsDto } from './response';
 import { error } from 'console';
 import { off } from 'process';
 import { GetSignInUserResponseDto } from './response/user';
-import { PostBoardRequestDto } from './request/board';
+import { PostBoardRequestDto, PostCommentRequestDto } from './request/board';
 import {
   PostBoardResponseDto,
   GetBoardResponseDto,
@@ -13,7 +13,9 @@ import {
   GetFavoriteListResponseDto,
   GetCommentListResponseDto,
   PutFavoriteResponseDto,
+  PostCommentResponseDto,
 } from './response/board';
+import { request } from 'http';
 
 const DOMAIN = 'http://localhost:4000';
 
@@ -207,6 +209,33 @@ export const putFavoriteRequest = async (
     .put(PUT_FAVORITE_URL(boardNumber), {}, authorization(accessToken))
     .then((response) => {
       const responseBody: PutFavoriteResponseDto = response.data;
+      return responseBody;
+    })
+    .catch((error) => {
+      if (!error.response) return null;
+      const responseBody: ResponsDto = error.response.data;
+      return responseBody;
+    });
+  return result;
+};
+
+// 댓글 작성
+export const POST_COMMENT_URL = (boardNumber: number | string) =>
+  `${API_DOMAIN}/board/${boardNumber}/comment`;
+
+export const PostCommentRequest = async (
+  boardNumber: number | string,
+  requestBody: PostCommentRequestDto,
+  accessToken: string
+) => {
+  const result = await axios
+    .post(
+      POST_COMMENT_URL(boardNumber),
+      requestBody,
+      authorization(accessToken)
+    )
+    .then((response) => {
+      const responseBody: PostCommentResponseDto = response.data;
       return responseBody;
     })
     .catch((error) => {

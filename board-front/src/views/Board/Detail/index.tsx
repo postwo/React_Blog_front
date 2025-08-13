@@ -14,6 +14,7 @@ import {
   getCommentListRequest,
   getFavoriteListRequest,
   increaseViewCountRequest,
+  PostCommentRequest,
   putFavoriteRequest,
 } from 'apis';
 import GetBoardResponseDto from 'apis/response/board/get-board.response.dto';
@@ -22,11 +23,15 @@ import {
   GetCommentListResponseDto,
   GetFavoriteListResponseDto,
   IncreaseViewCountResponseDto,
+  PostCommentResponseDto,
   PutFavoriteResponseDto,
 } from 'apis/response/board';
 
 import dayjs from 'dayjs';
 import { useCookies } from 'react-cookie';
+import { log } from 'console';
+import { PostCommentRequestDto } from 'apis/request/board';
+import { access } from 'fs';
 
 //            component: 게시물 상세 화면 컴포넌트      //
 export default function BoardDetail() {
@@ -275,6 +280,24 @@ export default function BoardDetail() {
       getFavoriteListRequest(boardNumber).then(getFavoriteListResponse);
     };
 
+    //      event handler: post comment response 처리 함수       //
+    const postCommentResponse = (
+      responseBody: PostCommentResponseDto | ResponsDto | null
+    ) => {
+      if (!responseBody) return;
+
+      const { code } = responseBody;
+      if (code === 'VF') alert('잘못된 접근 입니다');
+      if (code === 'NU') alert('존재하지 않는 유저 입니다');
+      if (code === 'NB') alert('존재하지 않는 게시물 입니다');
+      if (code === 'AF') alert('인증에 실패 했습니다');
+      if (code === 'DBE') alert('데이터 베이스 오류 입니다');
+      if (code !== 'SU') return;
+
+      if (!boardNumber) return;
+      getCommentListRequest(boardNumber).then(getCommentListResponse);
+    };
+
     //      event handler: 좋아요 클릭 이벤트 처리        //
     const onFavoriteClickHandler = () => {
       if (!loginUser || !cookies.accessToken || !boardNumber) return;
@@ -295,8 +318,13 @@ export default function BoardDetail() {
 
     //      event handler: 댓글 작성 버튼 클릭 이벤트 처리        //
     const onCommentSubmitButtonClickHandler = () => {
-      if (!comment) return;
-      alert('!!');
+      if (!comment || !boardNumber || !loginUser || !cookies.accessToken)
+        return;
+
+      const requestBody: PostCommentRequestDto = { content: comment };
+      PostCommentRequest(boardNumber, requestBody, cookies.accessToken).then(
+        postCommentResponse
+      );
     };
 
     //      event handler: 댓글 변경 이벤트 처리        //
