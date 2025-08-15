@@ -3,7 +3,7 @@ import './style.css';
 import FavoriteItem from 'components/FavoriteItem';
 import { Board, CommentListItem, FavoriteListItem } from 'types/interface';
 import CommentItem from 'components/CommentItem';
-import Pagenation from 'components/PageNation';
+import Pagination from 'components/Pagination';
 
 import DefaultProfileImage from 'assets/image/default-profile-image.png';
 import { useLoginUserStore } from 'stores';
@@ -31,7 +31,6 @@ import {
 
 import dayjs from 'dayjs';
 import { useCookies } from 'react-cookie';
-import { log } from 'console';
 import { PostCommentRequestDto } from 'apis/request/board';
 import { access } from 'fs';
 
@@ -437,7 +436,7 @@ export default function BoardDetail() {
             </div>
             <div className="divider"></div>
             <div className="board-detail-bottom-comment-pagination-box">
-              <Pagenation />
+              <Pagination />
             </div>
             <div className="board-detail-bottom-comment-input-box">
               <div className="board-detail-bottom-comment-input-container">
