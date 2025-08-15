@@ -33,6 +33,7 @@ import dayjs from 'dayjs';
 import { useCookies } from 'react-cookie';
 import { PostCommentRequestDto } from 'apis/request/board';
 import { access } from 'fs';
+import { usePagination } from 'hooks';
 
 //            component: 게시물 상세 화면 컴포넌트      //
 export default function BoardDetail() {
@@ -229,16 +230,27 @@ export default function BoardDetail() {
     // 빈배열 생성
     //      state: 좋아요 리스트 상태        //
     const [favoriteList, setFavoriteList] = useState<FavoriteListItem[]>([]);
-    //      state: 댓글 리스트 상태          //
-    const [commentList, setCommentList] = useState<CommentListItem[]>([]);
+    //      state: 페이지네이션 관련 상태        //
+    const {
+      currentPage,
+      setCurrentPage,
+      currentSection,
+      setCurrentSection,
+      viewList,
+      viewPageList,
+      totalSection,
+      setTotalList,
+    } = usePagination<CommentListItem>(3);
     //      state: 좋아요 상태              //
     const [isFavorite, setfavorite] = useState<boolean>(false);
     //      state: 좋아요 리스트 보기 상태              //
     const [showFavorite, setShowFavorite] = useState<boolean>(false);
-    //      state: 댓글 상자 보기 상태              //
-    const [showComment, setShowComment] = useState<boolean>(false);
+    //      state: 전체 댓글 개수 상태              //
+    const [totalCommentCount, setTotalCommentCount] = useState<number>(0);
     //      state: 댓글 상태              //
     const [comment, setComment] = useState<string>('');
+    //      state: 댓글 상자 보기 상태              //
+    const [showComment, setShowComment] = useState<boolean>(false);
 
     //      event handler: get favorite list response 처리 함수       //
     const getFavoriteListResponse = (
@@ -279,7 +291,8 @@ export default function BoardDetail() {
       if (code !== 'SU') return;
 
       const { commentListItem } = responseBody as GetCommentListResponseDto;
-      setCommentList(commentListItem);
+      setTotalList(commentListItem);
+      setTotalCommentCount(commentListItem.length);
     };
 
     //      event handler: put favorite response 처리 함수       //
@@ -367,7 +380,7 @@ export default function BoardDetail() {
       if (!boardNumber) return;
       getFavoriteListRequest(boardNumber).then(getFavoriteListResponse);
       getCommentListRequest(boardNumber).then(getCommentListResponse);
-    }, []);
+    }, [boardNumber]);
 
     //      render: 게시물 상세 하단 컴포넌트 렌더링   //
     return (
@@ -394,7 +407,7 @@ export default function BoardDetail() {
             <div className="icon-button">
               <div className="icon comment-icon"></div>
             </div>
-            <div className="board-detail-bottom-button-text">{`댓글 ${commentList.length}`}</div>
+            <div className="board-detail-bottom-button-text">{`댓글 ${totalCommentCount}`}</div>
             <div className="icon-button" onClick={onShowCommentClickHandler}>
               {showComment ? (
                 <div className="icon up-light-icon"></div>
@@ -426,39 +439,48 @@ export default function BoardDetail() {
             <div className="board-detail-bottom-comment-container">
               <div className="board-detail-bottom-comment-title">
                 {'댓글'}
-                <span className="emphasis">{commentList.length}</span>
+                <span className="emphasis">{totalCommentCount}</span>
               </div>
               <div className="board-detail-bottom-comment-list-container">
-                {commentList.map((item) => (
+                {viewList.map((item) => (
                   <CommentItem commentListItem={item} />
                 ))}
               </div>
             </div>
             <div className="divider"></div>
             <div className="board-detail-bottom-comment-pagination-box">
-              <Pagination />
+              <Pagination
+                currentPage={currentPage}
+                currentSection={currentSection}
+                setCurrentPage={setCurrentPage}
+                setCurrentSection={setCurrentSection}
+                viewPageList={viewPageList}
+                totalSection={totalSection}
+              />
             </div>
-            <div className="board-detail-bottom-comment-input-box">
-              <div className="board-detail-bottom-comment-input-container">
-                <textarea
-                  ref={commentRef}
-                  className="board-detail-bottom-comment-textarea"
-                  placeholder="댓글을 작성해주세요"
-                  value={comment}
-                  onChange={onCommentChangekHandler}
-                />
-                <div className="board-detail-bottom-comment-button-box">
-                  <div
-                    className={
-                      comment === '' ? 'disable-button' : 'black-button'
-                    }
-                    onClick={onCommentSubmitButtonClickHandler}
-                  >
-                    {'댓글달기'}
+            {loginUser !== null && (
+              <div className="board-detail-bottom-comment-input-box">
+                <div className="board-detail-bottom-comment-input-container">
+                  <textarea
+                    ref={commentRef}
+                    className="board-detail-bottom-comment-textarea"
+                    placeholder="댓글을 작성해주세요"
+                    value={comment}
+                    onChange={onCommentChangekHandler}
+                  />
+                  <div className="board-detail-bottom-comment-button-box">
+                    <div
+                      className={
+                        comment === '' ? 'disable-button' : 'black-button'
+                      }
+                      onClick={onCommentSubmitButtonClickHandler}
+                    >
+                      {'댓글달기'}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         )}
       </div>

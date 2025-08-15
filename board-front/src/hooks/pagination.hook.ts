@@ -54,7 +54,7 @@ const usePagination = <T>(countPerPage: number) => {
     //countPerPage = 한 페이지에 보여줄 항목 수 ,totlaList.length = 전체 데이터의 개수
     const totalPage = Math.ceil(totalList.length / countPerPage);
     const totalPageList: number[] = [];
-    for (let page = 1; page <= totalPage; page) totalPageList.push(page);
+    for (let page = 1; page <= totalPage; page++) totalPageList.push(page);
     setTotalPageList(totalPageList);
 
     //countPerPage * 10 = [1][2][3][4][5][6][7][8][9][10]
