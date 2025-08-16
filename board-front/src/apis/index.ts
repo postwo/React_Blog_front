@@ -5,7 +5,11 @@ import { ResponsDto } from './response';
 import { error } from 'console';
 import { off } from 'process';
 import { GetSignInUserResponseDto } from './response/user';
-import { PostBoardRequestDto, PostCommentRequestDto } from './request/board';
+import {
+  PatchBoardRequestDto,
+  PostBoardRequestDto,
+  PostCommentRequestDto,
+} from './request/board';
 import {
   PostBoardResponseDto,
   GetBoardResponseDto,
@@ -15,6 +19,7 @@ import {
   PutFavoriteResponseDto,
   PostCommentResponseDto,
   DeleteBoardResponseDto,
+  PatchBoardResponseDto,
 } from './response/board';
 import { request } from 'http';
 
@@ -259,6 +264,33 @@ export const deleteBoardRequest = async (
     .delete(DELETE_BOARD_URL(boardNumber), authorization(accessToken))
     .then((response) => {
       const responseBody: DeleteBoardResponseDto = response.data;
+      return responseBody;
+    })
+    .catch((error) => {
+      if (!error.response) return null;
+      const responseBody: ResponsDto = error.response.data;
+      return responseBody;
+    });
+  return result;
+};
+
+//게시물 수정
+export const PATCH_BOARD_URL = (boardNumber: number | string) =>
+  `${API_DOMAIN}/board/${boardNumber}`;
+
+export const patchBoardRequest = async (
+  boardNumber: number | string,
+  requestBody: PatchBoardRequestDto,
+  accessToken: string
+) => {
+  const result = await axios
+    .patch(
+      PATCH_BOARD_URL(boardNumber),
+      requestBody,
+      authorization(accessToken)
+    )
+    .then((response) => {
+      const responseBody: PatchBoardResponseDto = response.data;
       return responseBody;
     })
     .catch((error) => {
