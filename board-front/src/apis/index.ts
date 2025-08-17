@@ -20,8 +20,11 @@ import {
   PostCommentResponseDto,
   DeleteBoardResponseDto,
   PatchBoardResponseDto,
+  GetLatestBoardListResponseDto,
+  GetTop3BoardListResponseDto,
 } from './response/board';
 import { request } from 'http';
+import { GetPopularListResponseDto } from './response/search';
 
 const DOMAIN = 'http://localhost:4000';
 
@@ -291,6 +294,61 @@ export const patchBoardRequest = async (
     )
     .then((response) => {
       const responseBody: PatchBoardResponseDto = response.data;
+      return responseBody;
+    })
+    .catch((error) => {
+      if (!error.response) return null;
+      const responseBody: ResponsDto = error.response.data;
+      return responseBody;
+    });
+  return result;
+};
+
+//최신 게시물 리스트
+const GET_LATEST_BOARD_LIST_URL = () => `${API_DOMAIN}/board/latest-list`;
+
+export const getLatestBoardListRequest = async () => {
+  const result = await axios
+    .get(GET_LATEST_BOARD_LIST_URL())
+    .then((response) => {
+      const responseBody: GetLatestBoardListResponseDto = response.data;
+      return responseBody;
+    })
+    .catch((error) => {
+      if (!error.response) return null;
+      const responseBody: ResponsDto = error.response.data;
+      return responseBody;
+    });
+  return result;
+};
+
+//top3 리스트
+const GET_TOP_3_BOARD_LIST_URL = () => `${API_DOMAIN}/board/top-3`;
+
+export const getTop3BpardListRequest = async () => {
+  const result = await axios
+    .get(GET_TOP_3_BOARD_LIST_URL())
+    .then((response) => {
+      const responseBody: GetTop3BoardListResponseDto = response.data;
+      return responseBody;
+    })
+    .catch((error) => {
+      if (!error.response) return null;
+      const responseBody: ResponsDto = error.response.data;
+      return responseBody;
+    });
+  return result;
+};
+
+//인기 검색어 리스트 불러오기
+
+const GET_POPULAR_LIST_URL = () => `${API_DOMAIN}/search/popular-list`;
+
+export const getPopularListRequest = async () => {
+  const result = await axios
+    .get(GET_POPULAR_LIST_URL())
+    .then((response) => {
+      const responseBody: GetPopularListResponseDto = response.data;
       return responseBody;
     })
     .catch((error) => {
