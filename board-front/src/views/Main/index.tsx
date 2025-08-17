@@ -23,7 +23,7 @@ export default function Main() {
       <div id="main-top-wrapper">
         <div className="main-top-container">
           <div className="main-top-title">
-            {'hoos board에서\n다양한 이야기를 나눠보세요'}
+            {'CHI Blog에서\n다양한 이야기를 나눠보세요'}
           </div>
           <div className="main-top-contents-box">
             <div className="main-top-contents-title">{'주간 TOP 3 게시글'}</div>
@@ -67,7 +67,7 @@ export default function Main() {
             </div>
             <div className="main-bottom-popular-box">
               <div className="main-bottom-popular-card">
-                <div className="main-bottom-popular-card-box">
+                <div className="main-bottom-popular-card-container">
                   <div className="main-bottom-pupular-card-title">
                     {'인기 검색어'}
                   </div>
