@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import './style.css';
 import DefaultProfileImage from 'assets/image/default-profile-image.png';
 import { useParams } from 'react-router-dom';
@@ -14,7 +14,7 @@ export default function User() {
     const imageInputRef = useRef<HTMLInputElement | null>(null);
 
     //     state: 마이페이지 여부 상태      //
-    const [isMypage, setMyOage] = useState<boolean>(true);
+    const [isMypage, setMyPage] = useState<boolean>(true);
 
     //     state: 닉네임 변경 여부 상태      //
     const [isNicknameChange, setNicknameChange] = useState<boolean>(false);
@@ -27,6 +27,36 @@ export default function User() {
 
     //     state: 프로필 이미지 상태      //
     const [profileImage, setProfileImage] = useState<string | null>(null);
+
+    //     event handler: 프로필 박스 클릭 이벤트 처리      //
+    const onProfileBoxClickHandler = () => {
+      if (!isMypage) return;
+      if (!imageInputRef.current) return;
+      imageInputRef.current.click();
+    };
+
+    //     event handler: 닉네임 수정 버튼 클릭 이벤트 처리      //
+    const onNicknameEditButtonClickHandler = () => {
+      setChangeNickname(nickname);
+      setNicknameChange(!isNicknameChange);
+    };
+
+    //     event handler: 프로필 이미지 변경  이벤트 처리      //
+    const onProfileImageChangeHandler = (
+      event: ChangeEvent<HTMLInputElement>
+    ) => {
+      if (!event.target.files || !event.target.files.length) return;
+
+      const file = event.target.files[0];
+      const data = new FormData();
+      data.append('file', file);
+    };
+
+    //     event handler: 닉네임 변경  이벤트 처리      //
+    const onNicknameChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
+      const { value } = event.target;
+      setChangeNickname(value);
+    };
 
     //     effect: user email path variable 변경시 실행 할 함수    //
     useEffect(() => {
@@ -42,7 +72,10 @@ export default function User() {
       <div id="user-top-wrapper">
         <div className="user-top-container">
           {isMypage ? (
-            <div className="user-top-my-profile-image-box">
+            <div
+              className="user-top-my-profile-image-box"
+              onClick={onProfileBoxClickHandler}
+            >
               {profileImage !== null ? (
                 <div
                   className="user-top-profile-image"
@@ -51,10 +84,8 @@ export default function User() {
                   }}
                 ></div>
               ) : (
-                <div className="user-top-my-profile-image-nothing-box">
-                  <div className="icon-box-large">
-                    <div className="icon image-box-white-icon"></div>
-                  </div>
+                <div className="icon-box-large">
+                  <div className="icon image-box-white-icon"></div>
                 </div>
               )}
               <input
@@ -62,6 +93,7 @@ export default function User() {
                 type="file"
                 accept="image/*"
                 style={{ display: 'none' }}
+                onChange={onProfileImageChangeHandler}
               />
             </div>
           ) : (
@@ -83,13 +115,17 @@ export default function User() {
                     <input
                       className="user-top-info-nickname-input"
                       type="text"
-                      size={changeNickname.length + 1}
+                      size={changeNickname.length + 2}
                       value={changeNickname}
+                      onChange={onNicknameChangeHandler}
                     />
                   ) : (
                     <div className="user-top-info-nickname">{nickname}</div>
                   )}
-                  <div className="icon-button">
+                  <div
+                    className="icon-button"
+                    onClick={onNicknameEditButtonClickHandler}
+                  >
                     <div className="icon edit-icon"></div>
                   </div>
                 </>
