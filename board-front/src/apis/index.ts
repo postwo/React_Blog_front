@@ -22,9 +22,13 @@ import {
   PatchBoardResponseDto,
   GetLatestBoardListResponseDto,
   GetTop3BoardListResponseDto,
+  GetSearchBoardListResponseDto,
 } from './response/board';
 import { request } from 'http';
-import { GetPopularListResponseDto } from './response/search';
+import {
+  GetPopularListResponseDto,
+  GetRelationListResponseDto,
+} from './response/search';
 
 const DOMAIN = 'http://localhost:4000';
 
@@ -341,7 +345,6 @@ export const getTop3BpardListRequest = async () => {
 };
 
 //인기 검색어 리스트 불러오기
-
 const GET_POPULAR_LIST_URL = () => `${API_DOMAIN}/search/popular-list`;
 
 export const getPopularListRequest = async () => {
@@ -349,6 +352,52 @@ export const getPopularListRequest = async () => {
     .get(GET_POPULAR_LIST_URL())
     .then((response) => {
       const responseBody: GetPopularListResponseDto = response.data;
+      return responseBody;
+    })
+    .catch((error) => {
+      if (!error.response) return null;
+      const responseBody: ResponsDto = error.response.data;
+      return responseBody;
+    });
+  return result;
+};
+
+// 검색 페이지
+const GET_SEARCH_BOARD_LIST_URL = (
+  searchWord: string,
+  preSearchWord: string | null
+) =>
+  `${API_DOMAIN}/board/search-list/${searchWord} ${
+    preSearchWord ? '/' + preSearchWord : ''
+  }`;
+
+export const getSearchBoardListRequest = async (
+  searchWord: string,
+  preSearchWord: string | null
+) => {
+  const result = await axios
+    .get(GET_SEARCH_BOARD_LIST_URL(searchWord, preSearchWord))
+    .then((response) => {
+      const responseBody: GetSearchBoardListResponseDto = response.data;
+      return responseBody;
+    })
+    .catch((error) => {
+      if (!error.response) return null;
+      const responseBody: ResponsDto = error.response.data;
+      return responseBody;
+    });
+  return result;
+};
+
+//연관 검색어
+const GET_RELATION_LIST_URL = (searchWord: string) =>
+  `${API_DOMAIN}/search/${searchWord}/relation-list`;
+
+export const getRelationListRequest = async (searchWord: string) => {
+  const result = await axios
+    .get(GET_RELATION_LIST_URL(searchWord))
+    .then((response) => {
+      const responseBody: GetRelationListResponseDto = response.data;
       return responseBody;
     })
     .catch((error) => {
