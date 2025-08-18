@@ -13,7 +13,7 @@ export default function Search() {
   const { searchWord } = useParams();
 
   //         state: 검색 게시물 상태       //
-  const [count, setCount] = useState<number>(2);
+  const [count, setCount] = useState<number>(0);
 
   //         state: 검색 게시물 리스트 상태       //
   const [searchBoardList, setSearchBoardList] = useState<BoardListItem[]>([]);
@@ -32,6 +32,7 @@ export default function Search() {
   //         effect: 첫 마운트 시 실행될 함수         //
   useEffect(() => {
     setSearchBoardList(latestBoardListMock);
+    setRelationList([]);
   }, [searchWord]);
 
   //         render: 검색 화면 컴포넌트 렌더링        //
@@ -41,7 +42,7 @@ export default function Search() {
       <div className="search-container">
         <div className="search-title-box">
           <div className="search-title">
-            <span className="emphasis">{searchWord}</span>
+            <span className="search-title-emphasis">{searchWord}</span>
             {'에 대한 검색결과 입니다'}
           </div>
           <div className="search-count">{count}</div>
@@ -61,9 +62,11 @@ export default function Search() {
           <div className="search-relation-box">
             <div className="search-relation-card">
               <div className="search-relation-card-container">
-                <div className="search-relation-card-title"></div>
+                <div className="search-relation-card-title">{'관련검색어'}</div>
                 {relationList.length === 0 ? (
-                  <div className="search-relation-card-contents-nothing"></div>
+                  <div className="search-relation-card-contents-nothing">
+                    {'관련 검색어가 없습니다'}
+                  </div>
                 ) : (
                   <div className="search-relation-card-contents">
                     {relationList.map((word) => (
@@ -80,7 +83,12 @@ export default function Search() {
             </div>
           </div>
         </div>
-        <div className="search-pagination-box">{/* <Pagination/> */}</div>
+        <div className="search-pagination-box">
+          {/* {count !== 0 &&
+            {
+               <Pagination/> 
+            }} */}
+        </div>
       </div>
     </div>
   );
