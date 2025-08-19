@@ -4,7 +4,12 @@ import { SignInResponseDto, SignUpResponseDto } from './response/auth';
 import { ResponsDto } from './response';
 import { error } from 'console';
 import { off } from 'process';
-import { GetSignInUserResponseDto } from './response/user';
+import {
+  GetSignInUserResponseDto,
+  GetUserReponseDto,
+  PatchNicknameResponseDto,
+  PatchProfileImageResponseDto,
+} from './response/user';
 import {
   PatchBoardRequestDto,
   PostBoardRequestDto,
@@ -23,12 +28,17 @@ import {
   GetLatestBoardListResponseDto,
   GetTop3BoardListResponseDto,
   GetSearchBoardListResponseDto,
+  GetUserBoardListResponseDto,
 } from './response/board';
 import { request } from 'http';
 import {
   GetPopularListResponseDto,
   GetRelationListResponseDto,
 } from './response/search';
+import {
+  PatchNicknameRequestDto,
+  PatchProfileImageRequestDto,
+} from './request/user';
 
 const DOMAIN = 'http://localhost:4000';
 
@@ -398,6 +408,85 @@ export const getRelationListRequest = async (searchWord: string) => {
     .get(GET_RELATION_LIST_URL(searchWord))
     .then((response) => {
       const responseBody: GetRelationListResponseDto = response.data;
+      return responseBody;
+    })
+    .catch((error) => {
+      if (!error.response) return null;
+      const responseBody: ResponsDto = error.response.data;
+      return responseBody;
+    });
+  return result;
+};
+
+// 아무나 작성한 게시물 불러오기
+const GET_USER_BOARD_LIST_URL = (email: string) =>
+  `${API_DOMAIN}/board/user-board-list/${email}`;
+
+export const getUserBoardListRequest = async (email: string) => {
+  const result = await axios
+    .get(GET_USER_BOARD_LIST_URL(email))
+    .then((response) => {
+      const responseBody: GetUserBoardListResponseDto = response.data;
+      return responseBody;
+    })
+    .catch((error) => {
+      if (!error.response) return null;
+      const responseBody: ResponsDto = error.response.data;
+      return responseBody;
+    });
+  return result;
+};
+
+// 마이페이지
+const GET_USER_URL = (email: string) => `${API_DOMAIN}/user/${email}`;
+
+export const getUserRequest = async (email: string) => {
+  const result = await axios
+    .get(GET_USER_URL(email))
+    .then((response) => {
+      const responseBody: GetUserReponseDto = response.data;
+      return responseBody;
+    })
+    .catch((error) => {
+      if (!error.response) return null;
+      const responseBody: ResponsDto = error.response.data;
+      return responseBody;
+    });
+  return result;
+};
+
+// 닉네임 수정
+const PATCH_NICKNAME_URL = () => `${API_DOMAIN}/user/nickname`;
+
+export const patchNicknameRequest = async (
+  requestBody: PatchNicknameRequestDto,
+  accessToken: string
+) => {
+  const result = await axios
+    .patch(PATCH_NICKNAME_URL(), requestBody, authorization(accessToken))
+    .then((response) => {
+      const responseBody: PatchNicknameResponseDto = response.data;
+      return responseBody;
+    })
+    .catch((error) => {
+      if (!error.response) return null;
+      const responseBody: ResponsDto = error.response.data;
+      return responseBody;
+    });
+  return result;
+};
+
+// 이미지 수정
+const PATCH_PROFILE_IMAGE_URL = () => `${API_DOMAIN}/user/profile-image`;
+
+export const patchProfileImageRequest = async (
+  requestBody: PatchProfileImageRequestDto,
+  accessToken: string
+) => {
+  const result = await axios
+    .patch(PATCH_PROFILE_IMAGE_URL(), requestBody, authorization(accessToken))
+    .then((response) => {
+      const responseBody: PatchProfileImageResponseDto = response.data;
       return responseBody;
     })
     .catch((error) => {
